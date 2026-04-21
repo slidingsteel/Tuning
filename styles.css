@@ -21,7 +21,7 @@ body {
 
 .app {
   max-width: 960px;
-  margin: 32px auto;
+  margin: 40px auto;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -38,15 +38,19 @@ h1 {
 .lead {
   margin-top: 0;
   color: var(--sub);
-  line-height: 1.5;
 }
 
 .file-loader {
   margin: 12px 0 4px;
-  padding: 12px;
+  padding: 10px;
   border: 1px dashed var(--line);
   border-radius: 10px;
   background: #fafbff;
+}
+
+.file-loader-hint {
+  color: var(--sub);
+  font-size: 0.82rem;
 }
 
 .filters {
@@ -71,12 +75,10 @@ h1 {
 input,
 select,
 button {
-  width: 100%;
   font-size: 1rem;
   border-radius: 10px;
   border: 1px solid var(--line);
-  padding: 11px 12px;
-  min-height: 44px;
+  padding: 10px 12px;
 }
 
 input:focus,
@@ -86,7 +88,6 @@ select:focus {
 }
 
 button {
-  width: auto;
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
@@ -116,7 +117,6 @@ td {
   border-bottom: 1px solid var(--line);
   padding: 10px 8px;
   text-align: left;
-  vertical-align: top;
 }
 
 th {
@@ -131,77 +131,11 @@ th {
 
 @media (max-width: 720px) {
   .app {
-    margin: 10px;
-    padding: 14px;
-    border-radius: 10px;
-  }
-
-  h1 {
-    font-size: 1.25rem;
-  }
-
-  .lead {
-    font-size: 0.94rem;
+    margin: 16px;
+    padding: 16px;
   }
 
   .filters {
     grid-template-columns: 1fr;
-    margin: 14px 0;
-    gap: 10px;
-  }
-
-  button {
-    width: 100%;
-  }
-
-  table,
-  thead,
-  tbody,
-  tr,
-  th,
-  td {
-    display: block;
-  }
-
-  thead {
-    display: none;
-  }
-
-  tr {
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 8px;
-    margin-bottom: 10px;
-    background: #fff;
-  }
-
-  td {
-    border: none;
-    border-bottom: 1px dashed #e8ebf3;
-    padding: 8px 4px;
-  }
-
-  td:last-child {
-    border-bottom: none;
-  }
-
-  td::before {
-    content: attr(data-label);
-    display: block;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--sub);
-    margin-bottom: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-  }
-
-  .empty {
-    text-align: left;
-  }
-
-  .empty::before {
-    content: '';
-    display: none;
   }
 }
