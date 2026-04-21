@@ -10,36 +10,28 @@
     <main class="app">
       <h1>Slack Key Tunings</h1>
 
-      <section class="file-loader" aria-label="Source file picker">
+      <section class="file-loader">
         <label class="field">
-          <span>Select songs.html directly</span>
+          <span>Load songs.html</span>
           <input id="sourceFile" type="file" accept=".html,.htm,text/html" />
         </label>
       </section>
 
-      <section class="filters" aria-label="Search filters">
-        <label class="field">
-          <span>Search Category</span>
-          <select id="categoryFilter" disabled>
-            <option value="guitarist">Guitarist</option>
-            <option value="title">Song Title</option>
-            <option value="albumtitle">Album</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Keyword</span>
-          <input id="searchQuery" type="text" placeholder="Enter keyword..." disabled />
-        </label>
+      <section class="filters">
         <label class="field">
           <span>Tuning</span>
           <select id="tuningFilter" disabled>
             <option value="">All Tunings</option>
           </select>
         </label>
+        <label class="field">
+          <span>Search (Guitarist/Song)</span>
+          <input id="searchQuery" type="text" placeholder="Type here..." disabled />
+        </label>
         <button id="clearBtn" type="button" disabled>Clear</button>
       </section>
 
-      <p id="statusMessage" class="result-count">Loading song data...</p>
+      <p id="statusMessage" class="result-count">Loading...</p>
 
       <section class="table-wrap">
         <table>
@@ -56,8 +48,7 @@
         </table>
       </section>
     </main>
-
-    <iframe id="songsSource" src="songs.html" title="songs source" style="display:none;"></iframe>
+    <iframe id="songsSource" src="songs.html" title="songs source" hidden></iframe>
     <script src="app.js"></script>
   </body>
 </html>
