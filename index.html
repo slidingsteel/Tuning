@@ -10,19 +10,24 @@
     <main class="app">
       <h1>Slack Key Tunings</h1>
 
-      <section class="file-loader">
+      <p class="lead">
+        Load song data from a separate <code>songs.html</code> file and filter by tuning or guitarist.
+        <br />Supported formats: <code>#songSourceTable</code> or <code>ul.list li .tuning/.guitarist/.songtitle</code>
+      </p>
+
+      <section class="file-loader" aria-label="Source file picker">
         <label class="field">
-          <span>Select songs.html</span>
+          <span>Select songs.html directly (fallback for local file:// mode)</span>
           <input id="sourceFile" type="file" accept=".html,.htm,text/html" />
         </label>
       </section>
 
-      <section class="filters">
+      <section class="filters" aria-label="Search filters">
         <label class="field">
-          <span>Search By</span>
-          <select id="searchField" disabled>
+          <span>Search Category</span>
+          <select id="categoryFilter" disabled>
             <option value="guitarist">Guitarist</option>
-            <option value="title">Song Title</option>
+            <option value="songtitle">Song Title</option>
             <option value="albumtitle">Album</option>
           </select>
         </label>
@@ -30,9 +35,10 @@
         <label class="field">
           <span>Keyword</span>
           <input
-            id="keywordInput"
+            id="searchQuery"
             type="text"
-            placeholder="Example: Keola"
+            placeholder="Enter keyword..."
+            autocomplete="off"
             disabled
           />
         </label>
@@ -40,30 +46,32 @@
         <label class="field">
           <span>Tuning</span>
           <select id="tuningFilter" disabled>
-            <option value="">All</option>
+            <option value="">All Tunings</option>
           </select>
         </label>
 
         <button id="clearBtn" type="button" disabled>Clear</button>
       </section>
 
-      <p id="statusMessage">Loading...</p>
+      <p id="statusMessage" class="result-count" aria-live="polite">Loading song data...</p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Guitarist</th>
-            <th>Song Title</th>
-            <th>Tuning</th>
-            <th>Album</th>
-            <th>Remark</th>
-          </tr>
-        </thead>
-        <tbody id="resultBody"></tbody>
-      </table>
+      <section class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Guitarist</th>
+              <th>Song Title</th>
+              <th>Tuning</th>
+              <th>Album</th>
+              <th>Remark</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </section>
     </main>
 
-    <iframe id="songsSource" src="songs.html" hidden></iframe>
+    <iframe id="songsSource" src="songs.html" title="songs source" hidden></iframe>
     <script src="app.js"></script>
   </body>
 </html>
