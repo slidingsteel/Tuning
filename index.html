@@ -1,53 +1,68 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slack Key Guitarist Search</title>
+    <title>Slack Key Guitarist 検索</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="app">
       <h1>Slack Key Tunings</h1>
-
-      <section class="file-loader">
+<!--
+      <p class="lead">
+        別HTML（songs.html）の曲データを読み込み、チューニング名またはギタリスト名で絞り込み表示します。
+        <br />対応形式: <code>#songSourceTable</code> または <code>ul.list li .tuning/.guitarist/.songtitle</code>
+      </p>
+-->
+      <section id="fileLoaderSection" class="file-loader" aria-label="ソースファイル指定" hidden>
         <label class="field">
-          <span>Load songs.html</span>
+          <span>songs.html を直接指定（ローカル file:// 実行時の回避）</span>
+          <small class="file-loader-hint">songs.html の自動読み込みに失敗した場合のみ使用してください。</small>
           <input id="sourceFile" type="file" accept=".html,.htm,text/html" />
         </label>
       </section>
 
-      <section class="filters">
+      <section class="filters" aria-label="検索フィルター">
         <label class="field">
-          <span>Tuning</span>
+          <span>チューニング</span>
           <select id="tuningFilter" disabled>
-            <option value="">All Tunings</option>
+            <option value="">読み込み中...</option>
           </select>
         </label>
+
         <label class="field">
-          <span>Search (Guitarist/Song)</span>
-          <input id="searchQuery" type="text" placeholder="Type here..." disabled />
+          <span>ギタリスト名</span>
+          <input
+            id="guitaristFilter"
+            type="text"
+            placeholder="例: Keola / Sonny"
+            autocomplete="off"
+            disabled
+          />
         </label>
-        <button id="clearBtn" type="button" disabled>Clear</button>
+
+        <button id="clearBtn" type="button" disabled>クリア</button>
       </section>
 
-      <p id="statusMessage" class="result-count">Loading...</p>
+      <p id="statusMessage" class="result-count" aria-live="polite">曲データを読み込み中...</p>
 
       <section class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Guitarist</th>
-              <th>Song Title</th>
-              <th>Tuning</th>
-              <th>Album</th>
-              <th>Remark</th>
+              <th>ギタリスト</th>
+              <th>曲名</th>
+              <th>チューニング</th>
+              <th>アルバム</th>
+              <th>備考</th>
             </tr>
           </thead>
           <tbody id="resultBody"></tbody>
         </table>
       </section>
     </main>
+
     <iframe id="songsSource" src="songs.html" title="songs source" hidden></iframe>
     <script src="app.js"></script>
   </body>

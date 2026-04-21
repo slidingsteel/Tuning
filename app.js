@@ -1,60 +1,186 @@
 const tuningFilter = document.getElementById('tuningFilter');
-const searchQuery = document.getElementById('searchQuery');
+const guitaristFilter = document.getElementById('guitaristFilter');
 const resultBody = document.getElementById('resultBody');
 const statusMessage = document.getElementById('statusMessage');
 const clearBtn = document.getElementById('clearBtn');
 const songsSource = document.getElementById('songsSource');
+const sourceFile = document.getElementById('sourceFile');
+const fileLoaderSection = document.getElementById('fileLoaderSection');
 
-let allSongs = [];
+let songs = [];
 
-// テーブルデータ取得 (Table形式とList形式の両対応)
-function parseData(doc) {
-  const table = doc.querySelector('#songSourceTable');
-  if (table) {
-    return Array.from(table.querySelectorAll('tbody tr')).map(r => {
-      const d = r.querySelectorAll('td');
-      return { guitarist: d[1]?.textContent.trim(), title: d[0]?.textContent.trim(), tuning: d[2]?.textContent.trim(), album: d[3]?.textContent.trim(), remark: d[4]?.textContent.trim() };
-    });
+function setControlsEnabled(enabled) {
+  tuningFilter.disabled = !enabled;
+  guitaristFilter.disabled = !enabled;
+  clearBtn.disabled = !enabled;
+}
+
+function setFileLoaderVisible(visible) {
+  if (!fileLoaderSection) return;
+  fileLoaderSection.hidden = !visible;
+}
+
+
+function parseSongsFromTable(doc) {
+  const rows = [...doc.querySelectorAll('#songSourceTable tbody tr')];
+  return rows
+    .map((row) => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length < 3) return null;
+      return {
+        title: cells[0].textContent.trim(),
+        guitarist: cells[1].textContent.trim(),
+        tuning: cells[2].textContent.trim(),
+        albumtitle: (cells[3]?.textContent || '').trim(),
+        remark: (cells[4]?.textContent || '').trim()
+      };
+    })
+    .filter(Boolean);
+}
+
+function parseSongsFromLegacyList(doc) {
+  const items = [...doc.querySelectorAll('ul.list li')];
+  return items
+    .map((item) => {
+      const title = item.querySelector('.songtitle')?.textContent.trim() || '';
+      const guitarist = item.querySelector('.guitarist')?.textContent.trim() || '';
+      const tuning = item.querySelector('.tuning')?.textContent.trim() || '';
+      const albumtitle = item.querySelector('.albumtitle')?.textContent.trim() || '';
+      const remark = item.querySelector('.remark')?.textContent.trim() || '';
+
+      if (!title || !guitarist || !tuning) return null;
+      return { title, guitarist, tuning, albumtitle, remark };
+    })
+    .filter(Boolean);
+}
+
+function parseSongsFromSourceDocument(doc) {
+  const byTable = parseSongsFromTable(doc);
+  if (byTable.length > 0) return byTable;
+
+  const byLegacyList = parseSongsFromLegacyList(doc);
+  if (byLegacyList.length > 0) return byLegacyList;
+
+  return [];
+}
+
+function populateTuningOptions() {
+  tuningFilter.innerHTML = '<option value="">すべて</option>';
+  const tunings = [...new Set(songs.map((song) => song.tuning))].sort((a, b) => a.localeCompare(b));
+
+  tunings.forEach((tuning) => {
+    const option = document.createElement('option');
+    option.value = tuning;
+    option.textContent = tuning;
+    tuningFilter.appendChild(option);
+  });
+}
+
+function renderRows(list) {
+  resultBody.innerHTML = '';
+
+  if (list.length === 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td class="empty" colspan="5">該当するデータがありません</td>';
+    resultBody.appendChild(tr);
+    statusMessage.textContent = '0件';
+    return;
   }
-  return Array.from(doc.querySelectorAll('ul.list li')).map(li => ({
-    guitarist: li.querySelector('.guitarist')?.textContent.trim(),
-    title: li.querySelector('.songtitle')?.textContent.trim(),
-    tuning: li.querySelector('.tuning')?.textContent.trim(),
-    album: li.querySelector('.albumtitle')?.textContent.trim(),
-    remark: li.parentElement?.querySelector('.remark')?.textContent.trim()
-  }));
+
+  list.forEach((song) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${song.guitarist}</td>
+      <td>${song.title}</td>
+      <td>${song.tuning}</td>
+      <td>${song.albumtitle || ''}</td>
+      <td>${song.remark || ''}</td>
+    `;
+    resultBody.appendChild(tr);
+  });
+
+  statusMessage.textContent = `${list.length}件表示`;
 }
 
-function updateView() {
-  const query = searchQuery.value.toLowerCase();
-  const tuning = tuningFilter.value;
+function filterSongs() {
+  const selectedTuning = tuningFilter.value;
+  const guitaristQuery = guitaristFilter.value.trim().toLowerCase();
 
-  const filtered = allSongs.filter(s => 
-    (tuning === "" || s.tuning === tuning) &&
-    (s.guitarist.toLowerCase().includes(query) || s.title.toLowerCase().includes(query))
-  );
+  const filtered = songs.filter((song) => {
+    const tuningMatch = !selectedTuning || song.tuning === selectedTuning;
+    const guitaristMatch = !guitaristQuery || song.guitarist.toLowerCase().includes(guitaristQuery);
+    return tuningMatch && guitaristMatch;
+  });
 
-  resultBody.innerHTML = filtered.map(s => `
-    <tr data-label="Guitarist">
-      <td>${s.guitarist}</td>
-      <td data-label="Song">${s.title}</td>
-      <td data-label="Tuning">${s.tuning}</td>
-      <td data-label="Album">${s.album}</td>
-      <td data-label="Remark">${s.remark}</td>
-    </tr>`).join('');
-    
-  statusMessage.textContent = `Showing ${filtered.length} of ${allSongs.length} songs.`;
+  renderRows(filtered);
 }
 
-function initialize(doc) {
-  allSongs = parseData(doc);
-  const tunings = [...new Set(allSongs.map(s => s.tuning))].filter(Boolean).sort();
-  tuningFilter.innerHTML = '<option value="">All Tunings</option>' + tunings.map(t => `<option value="${t}">${t}</option>`).join('');
-  [tuningFilter, searchQuery, clearBtn].forEach(el => el.disabled = false);
-  updateView();
+function clearFilters() {
+  tuningFilter.value = '';
+  guitaristFilter.value = '';
+  filterSongs();
 }
 
-songsSource.addEventListener('load', () => initialize(songsSource.contentDocument));
-searchQuery.addEventListener('input', updateView);
-tuningFilter.addEventListener('change', updateView);
-clearBtn.addEventListener('click', () => { searchQuery.value = ''; tuningFilter.value = ''; updateView(); });
+function applyParsedSongs(parsedSongs, sourceLabel = 'songs.html') {
+  songs = parsedSongs;
+
+  if (songs.length === 0) {
+    statusMessage.textContent = `${sourceLabel} に有効なデータが見つかりません（table または ul.list 形式を確認）`;
+    return;
+  }
+
+  populateTuningOptions();
+  renderRows(songs);
+  setControlsEnabled(true);
+}
+
+function initializeFromIframe() {
+  const sourceDocument = songsSource.contentDocument;
+
+  if (!sourceDocument) {
+    setFileLoaderVisible(true);
+    statusMessage.textContent =
+      '自動読み込みに失敗しました。下のファイル選択で songs.html を指定してください（または http://localhost で実行）';
+    return;
+  }
+
+  const parsedSongs = parseSongsFromSourceDocument(sourceDocument);
+  setFileLoaderVisible(parsedSongs.length === 0);
+  applyParsedSongs(parsedSongs, 'songs.html');
+}
+
+function initializeFromSelectedFile(file) {
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const htmlText = typeof reader.result === 'string' ? reader.result : '';
+    const parser = new DOMParser();
+    const parsedDoc = parser.parseFromString(htmlText, 'text/html');
+    const parsedSongs = parseSongsFromSourceDocument(parsedDoc);
+    setFileLoaderVisible(parsedSongs.length === 0);
+    applyParsedSongs(parsedSongs, file.name || '選択ファイル');
+  };
+
+  reader.onerror = () => {
+    statusMessage.textContent = '選択したファイルの読み込みに失敗しました';
+  };
+
+  reader.readAsText(file, 'utf-8');
+}
+
+setFileLoaderVisible(window.location.protocol === 'file:');
+
+songsSource.addEventListener('load', initializeFromIframe);
+sourceFile.addEventListener('change', (event) => {
+  const file = event.target.files?.[0];
+  initializeFromSelectedFile(file);
+});
+
+if (songsSource.contentDocument?.readyState === 'complete') {
+  initializeFromIframe();
+}
+
+tuningFilter.addEventListener('change', filterSongs);
+guitaristFilter.addEventListener('input', filterSongs);
+clearBtn.addEventListener('click', clearFilters);
