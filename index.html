@@ -1,61 +1,59 @@
 <!doctype html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slack Key Guitarist 検索</title>
+    <title>Slack Key Guitarist Search</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="app">
-      <h1>Slack Key Tunings</h1>
-<!--
+      <h1>Slack Key Guitarist Search</h1>
       <p class="lead">
-        別HTML（songs.html）の曲データを読み込み、チューニング名またはギタリスト名で絞り込み表示します。
-        <br />対応形式: <code>#songSourceTable</code> または <code>ul.list li .tuning/.guitarist/.songtitle</code>
+        Load song data from a separate <code>songs.html</code> file and filter by tuning or guitarist.
+        <br />Supported formats: <code>#songSourceTable</code> or <code>ul.list li .tuning/.guitarist/.songtitle</code>
       </p>
--->
-      <section id="fileLoaderSection" class="file-loader" aria-label="ソースファイル指定" hidden>
+
+      <section class="file-loader" aria-label="Source file picker">
         <label class="field">
-          <span>songs.html を直接指定（ローカル file:// 実行時の回避）</span>
-          <small class="file-loader-hint">songs.html の自動読み込みに失敗した場合のみ使用してください。</small>
+          <span>Select songs.html directly (fallback for local file:// mode)</span>
           <input id="sourceFile" type="file" accept=".html,.htm,text/html" />
         </label>
       </section>
 
-      <section class="filters" aria-label="検索フィルター">
+      <section class="filters" aria-label="Search filters">
         <label class="field">
-          <span>チューニング</span>
+          <span>Tuning</span>
           <select id="tuningFilter" disabled>
-            <option value="">読み込み中...</option>
+            <option value="">Loading...</option>
           </select>
         </label>
 
         <label class="field">
-          <span>ギタリスト名</span>
+          <span>Guitarist</span>
           <input
             id="guitaristFilter"
             type="text"
-            placeholder="例: Keola / Sonny"
+            placeholder="Example: Keola / Sonny"
             autocomplete="off"
             disabled
           />
         </label>
 
-        <button id="clearBtn" type="button" disabled>クリア</button>
+        <button id="clearBtn" type="button" disabled>Clear</button>
       </section>
 
-      <p id="statusMessage" class="result-count" aria-live="polite">曲データを読み込み中...</p>
+      <p id="statusMessage" class="result-count" aria-live="polite">Loading song data...</p>
 
       <section class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ギタリスト</th>
-              <th>曲名</th>
-              <th>チューニング</th>
-              <th>アルバム</th>
-              <th>備考</th>
+              <th>Guitarist</th>
+              <th>Song Title</th>
+              <th>Tuning</th>
+              <th>Album</th>
+              <th>Remark</th>
             </tr>
           </thead>
           <tbody id="resultBody"></tbody>

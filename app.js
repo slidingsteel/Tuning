@@ -5,7 +5,6 @@ const statusMessage = document.getElementById('statusMessage');
 const clearBtn = document.getElementById('clearBtn');
 const songsSource = document.getElementById('songsSource');
 const sourceFile = document.getElementById('sourceFile');
-const fileLoaderSection = document.getElementById('fileLoaderSection');
 
 let songs = [];
 
@@ -14,12 +13,6 @@ function setControlsEnabled(enabled) {
   guitaristFilter.disabled = !enabled;
   clearBtn.disabled = !enabled;
 }
-
-function setFileLoaderVisible(visible) {
-  if (!fileLoaderSection) return;
-  fileLoaderSection.hidden = !visible;
-}
-
 
 function parseSongsFromTable(doc) {
   const rows = [...doc.querySelectorAll('#songSourceTable tbody tr')];
@@ -65,7 +58,7 @@ function parseSongsFromSourceDocument(doc) {
 }
 
 function populateTuningOptions() {
-  tuningFilter.innerHTML = '<option value="">すべて</option>';
+  tuningFilter.innerHTML = '<option value="">All</option>';
   const tunings = [...new Set(songs.map((song) => song.tuning))].sort((a, b) => a.localeCompare(b));
 
   tunings.forEach((tuning) => {
@@ -81,25 +74,25 @@ function renderRows(list) {
 
   if (list.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td class="empty" colspan="5">該当するデータがありません</td>';
+    tr.innerHTML = '<td class="empty" colspan="5">No matching results found.</td>';
     resultBody.appendChild(tr);
-    statusMessage.textContent = '0件';
+    statusMessage.textContent = '0 results';
     return;
   }
 
   list.forEach((song) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${song.guitarist}</td>
-      <td>${song.title}</td>
-      <td>${song.tuning}</td>
-      <td>${song.albumtitle || ''}</td>
-      <td>${song.remark || ''}</td>
+      <td data-label="Guitarist">${song.guitarist}</td>
+      <td data-label="Song Title">${song.title}</td>
+      <td data-label="Tuning">${song.tuning}</td>
+      <td data-label="Album">${song.albumtitle || ''}</td>
+      <td data-label="Remark">${song.remark || ''}</td>
     `;
     resultBody.appendChild(tr);
   });
 
-  statusMessage.textContent = `${list.length}件表示`;
+  statusMessage.textContent = `${list.length} results`;
 }
 
 function filterSongs() {
@@ -125,7 +118,7 @@ function applyParsedSongs(parsedSongs, sourceLabel = 'songs.html') {
   songs = parsedSongs;
 
   if (songs.length === 0) {
-    statusMessage.textContent = `${sourceLabel} に有効なデータが見つかりません（table または ul.list 形式を確認）`;
+    statusMessage.textContent = `No valid data found in ${sourceLabel} (expected table or ul.list format).`;
     return;
   }
 
@@ -138,14 +131,12 @@ function initializeFromIframe() {
   const sourceDocument = songsSource.contentDocument;
 
   if (!sourceDocument) {
-    setFileLoaderVisible(true);
     statusMessage.textContent =
-      '自動読み込みに失敗しました。下のファイル選択で songs.html を指定してください（または http://localhost で実行）';
+      'Auto-loading failed. Please select songs.html below, or run this app from http://localhost.';
     return;
   }
 
   const parsedSongs = parseSongsFromSourceDocument(sourceDocument);
-  setFileLoaderVisible(parsedSongs.length === 0);
   applyParsedSongs(parsedSongs, 'songs.html');
 }
 
@@ -158,18 +149,15 @@ function initializeFromSelectedFile(file) {
     const parser = new DOMParser();
     const parsedDoc = parser.parseFromString(htmlText, 'text/html');
     const parsedSongs = parseSongsFromSourceDocument(parsedDoc);
-    setFileLoaderVisible(parsedSongs.length === 0);
-    applyParsedSongs(parsedSongs, file.name || '選択ファイル');
+    applyParsedSongs(parsedSongs, file.name || 'selected file');
   };
 
   reader.onerror = () => {
-    statusMessage.textContent = '選択したファイルの読み込みに失敗しました';
+    statusMessage.textContent = 'Failed to read the selected file.';
   };
 
   reader.readAsText(file, 'utf-8');
 }
-
-setFileLoaderVisible(window.location.protocol === 'file:');
 
 songsSource.addEventListener('load', initializeFromIframe);
 sourceFile.addEventListener('change', (event) => {
