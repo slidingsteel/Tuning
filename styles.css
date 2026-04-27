@@ -35,6 +35,16 @@ h1 {
   font-size: 1.6rem;
 }
 
+.credit {
+  margin: 0 0 8px;
+  color: var(--sub);
+  font-size: 0.95rem;
+}
+
+.credit a {
+  color: var(--accent);
+}
+
 .lead {
   margin-top: 0;
   color: var(--sub);
