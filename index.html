@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slack Key Guitarist Search</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>Slack Key Guitarist Search</h1>
+
+      <p class="lead">
+        Load song data from a separate <code>songs.html</code> file and filter by tuning or guitarist.
+        <br />Supported formats: <code>#songSourceTable</code> or <code>ul.list li .tuning/.guitarist/.songtitle</code>
+      </p>
+
+      <section class="file-loader" aria-label="Source file picker">
+        <label class="field">
+          <span>Select songs.html directly (fallback for local file:// mode)</span>
+          <input id="sourceFile" type="file" accept=".html,.htm,text/html" />
+        </label>
+      </section>
+
+      <section class="filters" aria-label="Search filters">
+        <label class="field">
+          <span>Tuning</span>
+          <select id="tuningFilter" disabled>
+            <option value="">Loading...</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Guitarist</span>
+          <input
+            id="guitaristFilter"
+            type="text"
+            placeholder="Example: Keola / Sonny"
+            autocomplete="off"
+            disabled
+          />
+        </label>
+
+        <button id="clearBtn" type="button" disabled>Clear</button>
+      </section>
+
+      <p id="statusMessage" class="result-count" aria-live="polite">Loading song data...</p>
+
+      <section class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Guitarist</th>
+              <th>Song Title</th>
+              <th>Tuning</th>
+              <th>Album</th>
+              <th>Remark</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <iframe id="songsSource" src="songs.html" title="songs source" hidden></iframe>
+    <script src="app.js"></script>
+  </body>
+</html>
