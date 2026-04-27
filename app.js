@@ -1,4 +1,5 @@
 const tuningFilter = document.getElementById('tuningFilter');
+const searchField = document.getElementById('searchField');
 const guitaristFilter = document.getElementById('guitaristFilter');
 const resultBody = document.getElementById('resultBody');
 const statusMessage = document.getElementById('statusMessage');
@@ -12,8 +13,28 @@ let songs = [];
 
 function setControlsEnabled(enabled) {
   tuningFilter.disabled = !enabled;
+  searchField.disabled = !enabled;
   guitaristFilter.disabled = !enabled;
   clearBtn.disabled = !enabled;
+}
+
+function getSearchQuery() {
+  return guitaristFilter.value.trim().toLowerCase();
+}
+
+function getSearchValue(song) {
+  const selectedField = searchField.value;
+  return String(song[selectedField] || '').toLowerCase();
+}
+
+function updateSearchPlaceholder() {
+  const placeholders = {
+    guitarist: 'Example: Keola / Sonny',
+    title: 'Example: Hula / Sand',
+    albumtitle: 'Example: Dancing Cat / Pumehana'
+  };
+
+  guitaristFilter.placeholder = placeholders[searchField.value] || placeholders.guitarist;
 }
 
 function setSourcePickerVisible(visible) {
@@ -70,10 +91,10 @@ function parseSongsFromSourceDocument(doc) {
 }
 
 function getSongsMatchingGuitaristQuery() {
-  const guitaristQuery = guitaristFilter.value.trim().toLowerCase();
+  const query = getSearchQuery();
 
   return songs.filter((song) => {
-    return !guitaristQuery || song.guitarist.toLowerCase().includes(guitaristQuery);
+    return !query || getSearchValue(song).includes(query);
   });
 }
 
@@ -124,18 +145,20 @@ function renderRows(list) {
 
 function filterSongs() {
   const selectedTuning = tuningFilter.value;
-  const guitaristQuery = guitaristFilter.value.trim().toLowerCase();
+  const query = getSearchQuery();
 
   const filtered = songs.filter((song) => {
     const tuningMatch = !selectedTuning || song.tuning === selectedTuning;
-    const guitaristMatch = !guitaristQuery || song.guitarist.toLowerCase().includes(guitaristQuery);
-    return tuningMatch && guitaristMatch;
+    const searchMatch = !query || getSearchValue(song).includes(query);
+    return tuningMatch && searchMatch;
   });
 
   renderRows(filtered);
 }
 
 function clearFilters() {
+  searchField.value = 'guitarist';
+  updateSearchPlaceholder();
   guitaristFilter.value = '';
   populateTuningOptions();
   tuningFilter.value = '';
@@ -205,8 +228,14 @@ if (songsSource.contentDocument?.readyState === 'complete') {
 }
 
 tuningFilter.addEventListener('change', filterSongs);
+searchField.addEventListener('change', () => {
+  updateSearchPlaceholder();
+  populateTuningOptions();
+  filterSongs();
+});
 guitaristFilter.addEventListener('input', () => {
   populateTuningOptions();
   filterSongs();
 });
 clearBtn.addEventListener('click', clearFilters);
+updateSearchPlaceholder();
