@@ -69,9 +69,20 @@ function parseSongsFromSourceDocument(doc) {
   return [];
 }
 
+function getSongsMatchingGuitaristQuery() {
+  const guitaristQuery = guitaristFilter.value.trim().toLowerCase();
+
+  return songs.filter((song) => {
+    return !guitaristQuery || song.guitarist.toLowerCase().includes(guitaristQuery);
+  });
+}
+
 function populateTuningOptions() {
+  const previousValue = tuningFilter.value;
   tuningFilter.innerHTML = '<option value="">All</option>';
-  const tunings = [...new Set(songs.map((song) => song.tuning))].sort((a, b) => a.localeCompare(b));
+  const tunings = [...new Set(getSongsMatchingGuitaristQuery().map((song) => song.tuning))].sort((a, b) =>
+    a.localeCompare(b)
+  );
 
   tunings.forEach((tuning) => {
     const option = document.createElement('option');
@@ -79,6 +90,10 @@ function populateTuningOptions() {
     option.textContent = tuning;
     tuningFilter.appendChild(option);
   });
+
+  if (previousValue && tunings.includes(previousValue)) {
+    tuningFilter.value = previousValue;
+  }
 }
 
 function renderRows(list) {
@@ -121,8 +136,9 @@ function filterSongs() {
 }
 
 function clearFilters() {
-  tuningFilter.value = '';
   guitaristFilter.value = '';
+  populateTuningOptions();
+  tuningFilter.value = '';
   filterSongs();
 }
 
@@ -189,5 +205,8 @@ if (songsSource.contentDocument?.readyState === 'complete') {
 }
 
 tuningFilter.addEventListener('change', filterSongs);
-guitaristFilter.addEventListener('input', filterSongs);
+guitaristFilter.addEventListener('input', () => {
+  populateTuningOptions();
+  filterSongs();
+});
 clearBtn.addEventListener('click', clearFilters);
