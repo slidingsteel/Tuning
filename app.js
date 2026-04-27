@@ -101,9 +101,7 @@ function getSongsMatchingGuitaristQuery() {
 function populateTuningOptions() {
   const previousValue = tuningFilter.value;
   tuningFilter.innerHTML = '<option value="">All</option>';
-  const tunings = [...new Set(getSongsMatchingGuitaristQuery().map((song) => song.tuning))].sort((a, b) =>
-    a.localeCompare(b)
-  );
+  const tunings = [...new Set(getSongsMatchingGuitaristQuery().map((song) => song.tuning))];
 
   tunings.forEach((tuning) => {
     const option = document.createElement('option');
