@@ -6,8 +6,6 @@ const statusMessage = document.getElementById('statusMessage');
 const clearBtn = document.getElementById('clearBtn');
 const songsSource = document.getElementById('songsSource');
 const sourceFile = document.getElementById('sourceFile');
-const loaderLead = document.querySelector('.lead');
-const fileLoader = document.querySelector('.file-loader');
 
 let songs = [];
 
@@ -29,22 +27,12 @@ function getSearchValue(song) {
 
 function updateSearchPlaceholder() {
   const placeholders = {
-    guitarist: 'Example: Keola / Sonny',
+    guitarist: 'Example: Gabby / Atta',
     title: 'Example: Hula / Sand',
-    albumtitle: 'Example: Dancing Cat / Pumehana'
+    albumtitle: 'Example: Sonny / Panini'
   };
 
   guitaristFilter.placeholder = placeholders[searchField.value] || placeholders.guitarist;
-}
-
-function setSourcePickerVisible(visible) {
-  if (loaderLead) {
-    loaderLead.hidden = !visible;
-  }
-
-  if (fileLoader) {
-    fileLoader.hidden = !visible;
-  }
 }
 
 function parseSongsFromTable(doc) {
@@ -167,12 +155,10 @@ function applyParsedSongs(parsedSongs, sourceLabel = 'songs.html') {
   songs = parsedSongs;
 
   if (songs.length === 0) {
-    setSourcePickerVisible(true);
     statusMessage.textContent = `No valid data found in ${sourceLabel} (expected table or ul.list format).`;
     return;
   }
 
-  setSourcePickerVisible(sourceLabel !== 'songs.html');
   populateTuningOptions();
   renderRows(songs);
   setControlsEnabled(true);
@@ -182,7 +168,6 @@ function initializeFromIframe() {
   const sourceDocument = songsSource.contentDocument;
 
   if (!sourceDocument) {
-    setSourcePickerVisible(true);
     statusMessage.textContent =
       'Auto-loading failed. Please select songs.html below, or run this app from http://localhost.';
     return;
@@ -205,7 +190,6 @@ function initializeFromSelectedFile(file) {
   };
 
   reader.onerror = () => {
-    setSourcePickerVisible(true);
     statusMessage.textContent = 'Failed to read the selected file.';
   };
 
@@ -213,13 +197,10 @@ function initializeFromSelectedFile(file) {
 }
 
 songsSource.addEventListener('load', initializeFromIframe);
-
-if (sourceFile) {
-  sourceFile.addEventListener('change', (event) => {
-    const file = event.target.files?.[0];
-    initializeFromSelectedFile(file);
-  });
-}
+sourceFile.addEventListener('change', (event) => {
+  const file = event.target.files?.[0];
+  initializeFromSelectedFile(file);
+});
 
 if (songsSource.contentDocument?.readyState === 'complete') {
   initializeFromIframe();
