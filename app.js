@@ -29,9 +29,9 @@ function getSearchValue(song) {
 
 function updateSearchPlaceholder() {
   const placeholders = {
-    guitarist: 'Example: Keola / Sonny',
+    guitarist: 'Example: Gabby / Atta',
     title: 'Example: Hula / Sand',
-    albumtitle: 'Example: Dancing Cat / Pumehana'
+    albumtitle: 'Example: Sonny / Panini'
   };
 
   guitaristFilter.placeholder = placeholders[searchField.value] || placeholders.guitarist;
